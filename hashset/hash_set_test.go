@@ -1,4 +1,4 @@
-package collections
+package hashset
 
 import (
 	"testing"

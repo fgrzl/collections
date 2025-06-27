@@ -1,4 +1,4 @@
-package collections
+package concurrenthashset
 
 import "sync"
 
@@ -8,11 +8,23 @@ type ConcurrentHashSet[T comparable] struct {
 	data map[T]struct{}
 }
 
-// NewConcurrentHashSet creates a new, empty ConcurrentHashSet.
-func NewConcurrentHashSet[T comparable]() ConcurrentHashSet[T] {
-	return ConcurrentHashSet[T]{
-		data: make(map[T]struct{}),
+// ConcurrentHashSetOption defines a configuration function for ConcurrentHashSet.
+type ConcurrentHashSetOption[T comparable] func(*ConcurrentHashSet[T])
+
+// WithCapacity initializes the internal map with a given capacity.
+func WithCapacity[T comparable](capacity int) ConcurrentHashSetOption[T] {
+	return func(h *ConcurrentHashSet[T]) {
+		h.data = make(map[T]struct{}, capacity)
 	}
+}
+
+// NewConcurrentHashSet creates a new ConcurrentHashSet with optional configuration.
+func NewConcurrentHashSet[T comparable](opts ...ConcurrentHashSetOption[T]) ConcurrentHashSet[T] {
+	h := ConcurrentHashSet[T]{data: make(map[T]struct{})}
+	for _, opt := range opts {
+		opt(&h)
+	}
+	return h
 }
 
 func (h *ConcurrentHashSet[T]) Add(item T) {
