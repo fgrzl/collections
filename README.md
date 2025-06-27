@@ -1,35 +1,48 @@
-[![ci](https://github.com/fgrzl/collections/actions/workflows/ci.yml/badge.svg)](https://github.com/fgrzl/collections/actions/workflows/ci.yml)
+[![CI](https://github.com/fgrzl/collections/actions/workflows/ci.yml/badge.svg)](https://github.com/fgrzl/collections/actions/workflows/ci.yml)
 [![Dependabot Updates](https://github.com/fgrzl/collections/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/fgrzl/collections/actions/workflows/dependabot/dependabot-updates)
 
 # Collections
 
-## HashSet
+A fast, generic, and type-safe collections library for Go.
 
-A simple, type-safe, generic HashSet implementation in Go.
+## Features
 
-Built on top of Go's efficient map[T]struct{} idiom, HashSet provides fast membership testing, insertion, deletion, and iteration for any comparable type.
+- Type-safe, generic implementations using Go 1.18+ generics
+- Minimal memory overhead and optimized performance
+- Modular design with consistent APIs and optional capacity preallocation
+- Thread-safe variants where appropriate
 
-Features
-Generic over any comparable type
+## Included Collections
 
-Constant time O(1) operations for Add, Remove, and Contains
+### `hashset.HashSet[T]`
+A simple, non-thread-safe hash set.
 
-Simple API: Add, Remove, Contains, Size, IsEmpty, Clear, ToSlice, and ForEach
+- Backed by `map[T]struct{}`
+- Operations: `Add`, `Remove`, `Contains`, `IsEmpty`, `Size`, `Clear`, `ToSlice`, `ForEach`
+- Optional: `WithCapacity`
 
-Zero unnecessary memory allocations
+### `concurrenthashset.ConcurrentHashSet[T]`
+Thread-safe version of `HashSet`.
 
-## ConcurrentHashSet
+- Uses `sync.RWMutex` for concurrent access
+- Same API as `HashSet`
+- Optional: `WithCapacity`
 
-A simple, type-safe, generic ConcurrentHashSet implementation in Go.
+### `queue.Queue[T]`
+An optimized FIFO queue with internal shifting and reallocation.
 
-Built on top of Go's efficient map[T]struct{} idiom, ConcurrentHashSet provides fast membership testing, insertion, deletion, and iteration for any comparable type.
+- Fast `Enqueue`, `Dequeue`, and `Length` operations
+- Avoids unnecessary allocations with shifting and shrinking
+- Optional: `WithCapacity`
 
-Features
-Generic over any comparable type
+### `stack.Stack[T]`
+Simple LIFO stack.
 
-Constant time O(1) operations for Add, Remove, and Contains
+- Operations: `Push`, `Pop`, `Peek`, `Length`, `IsEmpty`, `Reset`
+- Optional: `WithCapacity`
 
-Simple API: Add, Remove, Contains, Size, IsEmpty, Clear, ToSlice, and ForEach
+## Installation
 
-Zero unnecessary memory allocations
-
+```bash
+go get github.com/fgrzl/collections
+```
