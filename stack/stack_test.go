@@ -93,7 +93,7 @@ func TestStack_Reset(t *testing.T) {
 
 func TestStack_WithCapacity(t *testing.T) {
 	// Arrange
-	s := NewStack )
+	s := NewStack[int](WithCapacity[int](10))
 
 	// Act
 	s.Push(1)
