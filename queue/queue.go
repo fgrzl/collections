@@ -1,5 +1,6 @@
 package queue
 
+// WithCapacity returns an option that preallocates the queue with the given capacity.
 func WithCapacity[T any](capacity int) func(*Queue[T]) {
 	return func(q *Queue[T]) {
 		q.items = make([]T, 0, capacity)
@@ -7,6 +8,7 @@ func WithCapacity[T any](capacity int) func(*Queue[T]) {
 }
 
 // Queue is an optimized FIFO queue with preallocation and efficient memory management.
+// It keeps head and tail indices to avoid unnecessary allocations when dequeuing.
 type Queue[T any] struct {
 	items []T
 	head  int
@@ -25,7 +27,7 @@ func NewQueue[T any](opts ...func(*Queue[T])) *Queue[T] {
 	return q
 }
 
-// Enqueue adds an item efficiently to the end of the queue.
+// Enqueue adds an item to the end of the queue.
 func (q *Queue[T]) Enqueue(item T) {
 	if q.tail == len(q.items) && q.head > 0 {
 		// Shift items left if head has moved and tail reached end
@@ -38,6 +40,7 @@ func (q *Queue[T]) Enqueue(item T) {
 }
 
 // Dequeue removes and returns the first item in the queue.
+// The second return value reports whether an item was returned.
 func (q *Queue[T]) Dequeue() (T, bool) {
 	var zero T
 	if q.IsEmpty() {

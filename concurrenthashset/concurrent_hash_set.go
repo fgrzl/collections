@@ -3,6 +3,7 @@ package concurrenthashset
 import "sync"
 
 // ConcurrentHashSet is a thread-safe version of HashSet.
+// It uses an RWMutex to protect accesses to the underlying map.
 type ConcurrentHashSet[T comparable] struct {
 	mu   sync.RWMutex
 	data map[T]struct{}
@@ -19,10 +20,11 @@ func WithCapacity[T comparable](capacity int) ConcurrentHashSetOption[T] {
 }
 
 // NewConcurrentHashSet creates a new ConcurrentHashSet with optional configuration.
-func NewConcurrentHashSet[T comparable](opts ...ConcurrentHashSetOption[T]) ConcurrentHashSet[T] {
-	h := ConcurrentHashSet[T]{data: make(map[T]struct{})}
+// The returned value is a pointer to allow safe concurrent use without copying the mutex.
+func NewConcurrentHashSet[T comparable](opts ...ConcurrentHashSetOption[T]) *ConcurrentHashSet[T] {
+	h := &ConcurrentHashSet[T]{data: make(map[T]struct{})}
 	for _, opt := range opts {
-		opt(&h)
+		opt(h)
 	}
 	return h
 }

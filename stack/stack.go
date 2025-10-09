@@ -1,5 +1,6 @@
 package stack
 
+// WithCapacity returns an option that preallocates the stack with the given capacity.
 func WithCapacity[T any](capacity int) func(*Stack[T]) {
 	return func(s *Stack[T]) {
 		s.items = make([]T, 0, capacity)
@@ -7,6 +8,7 @@ func WithCapacity[T any](capacity int) func(*Stack[T]) {
 }
 
 // Stack is a generic LIFO stack.
+// It stores elements in a slice and grows as items are pushed.
 type Stack[T any] struct {
 	items []T
 }

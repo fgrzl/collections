@@ -16,39 +16,43 @@ func WithCapacity[T comparable](capacity int) HashSetOption[T] {
 }
 
 // NewHashSet creates a new HashSet with optional configuration.
-func NewHashSet[T comparable](opts ...HashSetOption[T]) HashSet[T] {
-	h := HashSet[T]{data: make(map[T]struct{})}
+func NewHashSet[T comparable](opts ...HashSetOption[T]) *HashSet[T] {
+	h := &HashSet[T]{data: make(map[T]struct{})}
 	for _, opt := range opts {
-		opt(&h)
+		opt(h)
 	}
 	return h
 }
 
-func (h HashSet[T]) Add(item T) {
+func (h *HashSet[T]) Add(item T) {
 	h.data[item] = struct{}{}
 }
 
-func (h HashSet[T]) Remove(item T) {
+func (h *HashSet[T]) Remove(item T) {
 	delete(h.data, item)
 }
 
+// Contains reports whether item is present in the set.
 func (h HashSet[T]) Contains(item T) bool {
 	_, exists := h.data[item]
 	return exists
 }
 
+// IsEmpty reports whether the set contains no elements.
 func (h HashSet[T]) IsEmpty() bool {
 	return len(h.data) == 0
 }
 
+// Size returns the number of elements in the set.
 func (h HashSet[T]) Size() int {
 	return len(h.data)
 }
 
-func (h HashSet[T]) Clear() {
+func (h *HashSet[T]) Clear() {
 	clear(h.data)
 }
 
+// ToSlice returns the elements of the set as a slice. The order is unspecified.
 func (h HashSet[T]) ToSlice() []T {
 	slice := make([]T, 0, len(h.data))
 	for item := range h.data {
@@ -57,6 +61,7 @@ func (h HashSet[T]) ToSlice() []T {
 	return slice
 }
 
+// ForEach invokes action for every element in the set. The iteration order is unspecified.
 func (h HashSet[T]) ForEach(action func(T)) {
 	for item := range h.data {
 		action(item)
