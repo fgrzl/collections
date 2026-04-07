@@ -12,7 +12,7 @@ func WithCapacity[T any](capacity int) func(*Queue[T]) {
 type Queue[T any] struct {
 	items []T
 	head  int
-	tail  int // Added tail to track end of queue
+	tail  int
 }
 
 // NewQueue initializes a queue with a preallocated capacity.
@@ -80,12 +80,4 @@ func (q *Queue[T]) Reset() {
 	}
 	q.head = 0
 	q.tail = 0
-}
-
-func (q *Queue[T]) Head() int {
-	return q.head
-}
-
-func (q *Queue[T]) Tail() int {
-	return q.tail
 }

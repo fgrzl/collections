@@ -111,3 +111,12 @@ func TestHashSet_ForEach(t *testing.T) {
 	// Assert
 	assert.Equal(t, 3, sum, "Expected sum to be 3")
 }
+
+func TestHashSet_ZeroValueUsable(t *testing.T) {
+	var set HashSet[int]
+
+	set.Add(1)
+
+	assert.True(t, set.Contains(1), "Expected zero-value set to accept added items")
+	assert.Equal(t, 1, set.Size(), "Expected zero-value set size to update after Add")
+}

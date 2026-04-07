@@ -8,6 +8,12 @@ type HashSet[T comparable] struct {
 // HashSetOption defines a configuration function for HashSet.
 type HashSetOption[T comparable] func(*HashSet[T])
 
+func (h *HashSet[T]) ensureData() {
+	if h.data == nil {
+		h.data = make(map[T]struct{})
+	}
+}
+
 // WithCapacity initializes the internal map with a given capacity.
 func WithCapacity[T comparable](capacity int) HashSetOption[T] {
 	return func(h *HashSet[T]) {
@@ -25,6 +31,7 @@ func NewHashSet[T comparable](opts ...HashSetOption[T]) *HashSet[T] {
 }
 
 func (h *HashSet[T]) Add(item T) {
+	h.ensureData()
 	h.data[item] = struct{}{}
 }
 

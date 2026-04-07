@@ -130,3 +130,45 @@ func TestFluentBuilders(t *testing.T) {
 		t.Error("Empty stack builder should create empty stack")
 	}
 }
+
+func TestFluentBuilders_IntuitiveOrder(t *testing.T) {
+	stack := collections.NewStackBuilder[int]().
+		WithValues(1, 2).
+		WithCapacity(10).
+		WithValues(3).
+		Build()
+
+	if stack.Length() != 3 {
+		t.Fatalf("Stack builder should preserve all values regardless of call order, got length %d", stack.Length())
+	}
+
+	if val, ok := stack.Pop(); !ok || val != 3 {
+		t.Fatalf("Stack builder should preserve LIFO ordering, expected 3, got %v", val)
+	}
+	if val, ok := stack.Pop(); !ok || val != 2 {
+		t.Fatalf("Stack builder should preserve earlier values, expected 2, got %v", val)
+	}
+	if val, ok := stack.Pop(); !ok || val != 1 {
+		t.Fatalf("Stack builder should preserve earlier values, expected 1, got %v", val)
+	}
+
+	queue := collections.NewQueueBuilder[string]().
+		WithValues("alpha", "beta").
+		WithCapacity(5).
+		WithValues("gamma").
+		Build()
+
+	if queue.Length() != 3 {
+		t.Fatalf("Queue builder should preserve all values regardless of call order, got length %d", queue.Length())
+	}
+
+	if val, ok := queue.Dequeue(); !ok || val != "alpha" {
+		t.Fatalf("Queue builder should preserve FIFO ordering, expected alpha, got %v", val)
+	}
+	if val, ok := queue.Dequeue(); !ok || val != "beta" {
+		t.Fatalf("Queue builder should preserve earlier values, expected beta, got %v", val)
+	}
+	if val, ok := queue.Dequeue(); !ok || val != "gamma" {
+		t.Fatalf("Queue builder should preserve later values, expected gamma, got %v", val)
+	}
+}

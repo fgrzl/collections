@@ -12,6 +12,12 @@ type ConcurrentHashSet[T comparable] struct {
 // ConcurrentHashSetOption defines a configuration function for ConcurrentHashSet.
 type ConcurrentHashSetOption[T comparable] func(*ConcurrentHashSet[T])
 
+func (h *ConcurrentHashSet[T]) ensureData() {
+	if h.data == nil {
+		h.data = make(map[T]struct{})
+	}
+}
+
 // WithCapacity initializes the internal map with a given capacity.
 func WithCapacity[T comparable](capacity int) ConcurrentHashSetOption[T] {
 	return func(h *ConcurrentHashSet[T]) {
@@ -32,6 +38,7 @@ func NewConcurrentHashSet[T comparable](opts ...ConcurrentHashSetOption[T]) *Con
 func (h *ConcurrentHashSet[T]) Add(item T) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	h.ensureData()
 	h.data[item] = struct{}{}
 }
 
@@ -77,11 +84,17 @@ func (h *ConcurrentHashSet[T]) ToSlice() []T {
 	return slice
 }
 
+// ForEach invokes action for every element in the set.
+// It snapshots the current elements before invoking callbacks so the callback can mutate the set.
 func (h *ConcurrentHashSet[T]) ForEach(action func(T)) {
 	h.mu.RLock()
-	defer h.mu.RUnlock()
-
+	items := make([]T, 0, len(h.data))
 	for item := range h.data {
+		items = append(items, item)
+	}
+	h.mu.RUnlock()
+
+	for _, item := range items {
 		action(item)
 	}
 }

@@ -3,6 +3,7 @@ package concurrenthashset
 import (
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -141,4 +142,35 @@ func TestConcurrentHashSet_ParallelAccess(t *testing.T) {
 		}(i)
 	}
 	wg.Wait()
+}
+
+func TestConcurrentHashSet_ZeroValueUsable(t *testing.T) {
+	var set ConcurrentHashSet[int]
+
+	set.Add(1)
+
+	assert.True(t, set.Contains(1), "Expected zero-value concurrent set to accept added items")
+	assert.Equal(t, 1, set.Size(), "Expected zero-value concurrent set size to update after Add")
+}
+
+func TestConcurrentHashSet_ForEachAllowsMutation(t *testing.T) {
+	set := NewConcurrentHashSet[int]()
+	set.Add(1)
+	set.Add(2)
+	set.Add(3)
+
+	done := make(chan struct{})
+	go func() {
+		set.ForEach(func(item int) {
+			set.Remove(item)
+		})
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		assert.True(t, set.IsEmpty(), "Expected removals inside ForEach callback to succeed")
+	case <-time.After(2 * time.Second):
+		t.Fatal("ForEach deadlocked when callback mutated the set")
+	}
 }

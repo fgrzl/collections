@@ -65,7 +65,7 @@ func TestQueue_Reset(t *testing.T) {
 	require.Equal(t, 42, v)
 }
 
-func TestQueue_Reallocation(t *testing.T) {
+func TestQueue_CompactionPreservesFIFOOrder(t *testing.T) {
 	// Arrange
 	q := NewQueue[int]()
 	for i := 0; i < 4; i++ {
@@ -81,6 +81,12 @@ func TestQueue_Reallocation(t *testing.T) {
 
 	// Assert
 	require.Equal(t, 4, q.Length())
-	require.Equal(t, 0, q.Head()) // after reallocation, head is reset
-	require.Equal(t, 4, q.Tail()) // tail is updated to new length
+
+	for _, expected := range []int{2, 3, 4, 5} {
+		value, ok := q.Dequeue()
+		require.True(t, ok)
+		require.Equal(t, expected, value)
+	}
+
+	require.True(t, q.IsEmpty())
 }

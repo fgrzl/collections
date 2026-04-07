@@ -17,8 +17,6 @@ func NewStack[T any](opts ...func(*Stack[T])) *Stack[T] {
 }
 
 // NewStackWithCapacity creates a new stack with preallocated capacity.
-// This is a convenience function that eliminates the need for explicit type parameters
-// when the capacity is known upfront.
 func NewStackWithCapacity[T any](capacity int) *Stack[T] {
 	return stack.NewStack(stack.WithCapacity[T](capacity))
 }
@@ -37,8 +35,6 @@ func NewQueue[T any](opts ...func(*Queue[T])) *Queue[T] {
 }
 
 // NewQueueWithCapacity creates a new queue with preallocated capacity.
-// This is a convenience function that eliminates the need for explicit type parameters
-// when the capacity is known upfront.
 func NewQueueWithCapacity[T any](capacity int) *Queue[T] {
 	return queue.NewQueue(queue.WithCapacity[T](capacity))
 }
@@ -58,8 +54,6 @@ func NewHashSet[T comparable](opts ...HashSetOption[T]) *HashSet[T] {
 }
 
 // NewHashSetWithCapacity creates a new HashSet with preallocated capacity.
-// This is a convenience function that eliminates the need for explicit type parameters
-// when the capacity is known upfront.
 func NewHashSetWithCapacity[T comparable](capacity int) *HashSet[T] {
 	return hashset.NewHashSet(hashset.WithCapacity[T](capacity))
 }
@@ -79,8 +73,6 @@ func NewConcurrentHashSet[T comparable](opts ...ConcurrentHashSetOption[T]) *Con
 }
 
 // NewConcurrentHashSetWithCapacity creates a new ConcurrentHashSet with preallocated capacity.
-// This is a convenience function that eliminates the need for explicit type parameters
-// when the capacity is known upfront.
 func NewConcurrentHashSetWithCapacity[T comparable](capacity int) *ConcurrentHashSet[T] {
 	return concurrenthashset.NewConcurrentHashSet(concurrenthashset.WithCapacity[T](capacity))
 }
@@ -136,7 +128,8 @@ func ConcurrentHashSetOf[T comparable](values ...T) *ConcurrentHashSet[T] {
 
 // StackBuilder provides a fluent interface for building stacks with multiple options.
 type StackBuilder[T any] struct {
-	opts []func(*Stack[T])
+	capacity *int
+	values   []T
 }
 
 // NewStackBuilder creates a new StackBuilder.
@@ -146,28 +139,33 @@ func NewStackBuilder[T any]() *StackBuilder[T] {
 
 // WithCapacity sets the initial capacity for the stack.
 func (sb *StackBuilder[T]) WithCapacity(capacity int) *StackBuilder[T] {
-	sb.opts = append(sb.opts, StackWithCapacity[T](capacity))
+	sb.capacity = &capacity
 	return sb
 }
 
 // WithValues initializes the stack with the provided values.
 func (sb *StackBuilder[T]) WithValues(values ...T) *StackBuilder[T] {
-	sb.opts = append(sb.opts, func(s *Stack[T]) {
-		for _, v := range values {
-			s.Push(v)
-		}
-	})
+	sb.values = append(sb.values, values...)
 	return sb
 }
 
 // Build creates the stack with all configured options.
 func (sb *StackBuilder[T]) Build() *Stack[T] {
-	return NewStack(sb.opts...)
+	var stackOpts []func(*Stack[T])
+	if sb.capacity != nil {
+		stackOpts = append(stackOpts, StackWithCapacity[T](*sb.capacity))
+	}
+	s := NewStack(stackOpts...)
+	for _, v := range sb.values {
+		s.Push(v)
+	}
+	return s
 }
 
 // QueueBuilder provides a fluent interface for building queues with multiple options.
 type QueueBuilder[T any] struct {
-	opts []func(*Queue[T])
+	capacity *int
+	values   []T
 }
 
 // NewQueueBuilder creates a new QueueBuilder.
@@ -177,21 +175,25 @@ func NewQueueBuilder[T any]() *QueueBuilder[T] {
 
 // WithCapacity sets the initial capacity for the queue.
 func (qb *QueueBuilder[T]) WithCapacity(capacity int) *QueueBuilder[T] {
-	qb.opts = append(qb.opts, QueueWithCapacity[T](capacity))
+	qb.capacity = &capacity
 	return qb
 }
 
 // WithValues initializes the queue with the provided values.
 func (qb *QueueBuilder[T]) WithValues(values ...T) *QueueBuilder[T] {
-	qb.opts = append(qb.opts, func(q *Queue[T]) {
-		for _, v := range values {
-			q.Enqueue(v)
-		}
-	})
+	qb.values = append(qb.values, values...)
 	return qb
 }
 
 // Build creates the queue with all configured options.
 func (qb *QueueBuilder[T]) Build() *Queue[T] {
-	return NewQueue(qb.opts...)
+	var queueOpts []func(*Queue[T])
+	if qb.capacity != nil {
+		queueOpts = append(queueOpts, QueueWithCapacity[T](*qb.capacity))
+	}
+	q := NewQueue(queueOpts...)
+	for _, v := range qb.values {
+		q.Enqueue(v)
+	}
+	return q
 }
