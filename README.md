@@ -46,3 +46,7 @@ Simple LIFO stack.
 ```bash
 go get github.com/fgrzl/collections
 ```
+
+## Documentation
+
+Guides: **[docs/](docs/README.md)** — [overview](docs/overview.md), [getting started](docs/getting-started.md)
