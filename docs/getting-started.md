@@ -12,7 +12,8 @@ go get github.com/fgrzl/collections
 import "github.com/fgrzl/collections/hashset"
 
 set := hashset.NewHashSet[string](hashset.WithCapacity(64))
-set.Add("alpha", "beta")
+set.Add("alpha")
+set.Add("beta")
 if set.Contains("alpha") {
     // ...
 }
@@ -32,7 +33,9 @@ set := collections.NewHashSetWithCapacity[string](64)
 import "github.com/fgrzl/collections/queue"
 
 q := queue.NewQueue[int]()
-q.Enqueue(1, 2, 3)
+q.Enqueue(1)
+q.Enqueue(2)
+q.Enqueue(3)
 v, ok := q.Dequeue() // 1, true
 ```
 
@@ -42,7 +45,8 @@ v, ok := q.Dequeue() // 1, true
 import "github.com/fgrzl/collections/stack"
 
 s := stack.NewStack[string]()
-s.Push("bottom", "top")
+s.Push("bottom")
+s.Push("top")
 v, ok := s.Pop() // "top", true
 ```
 
